@@ -12,7 +12,6 @@
         .sidebar-link:hover { background-color: rgba(59, 130, 246, 0.1); }
         .sidebar-link.active { background-color: #2563eb; color: white; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2); }
         
-        /* Animasi Modal */
         #discountModal.hidden { display: none; }
         .modal-enter { animation: modalFadeIn 0.3s ease-out; }
         @keyframes modalFadeIn {
@@ -87,7 +86,7 @@
                 @endif
 
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-white">
+                    <div class="p-6 border-b border-slate-100 flex justify-between items-center">
                         <div>
                             <h2 class="text-lg font-bold text-slate-900">Daftar Member Terdaftar</h2>
                             <p class="text-sm text-slate-500">Kelola akses dan diskon khusus member</p>
@@ -164,7 +163,7 @@
                     </button>
                 </div>
                 
-                <form action="{{ route('admin.user.give_discount') }}" method="POST" class="p-6">
+                <form action="{{ route('admin.user.give_discount') }}" method="POST" id="discountForm" class="p-6">
                     @csrf
                     <input type="hidden" name="user_id" id="modal_user_id">
                     
@@ -187,15 +186,21 @@
                                 placeholder="0">
                             <span class="absolute right-4 top-4 font-black text-slate-400 text-xl">%</span>
                         </div>
-                        <p class="text-[10px] text-slate-400 mt-3">* Masukkan 0 jika ingin menghapus diskon member ini.</p>
                     </div>
 
-                    <div class="flex gap-3">
-                        <button type="button" onclick="closeDiscountModal()" 
-                            class="flex-1 px-4 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition-all">Batal</button>
-                        <button type="submit" 
-                            class="flex-1 px-4 py-3 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-2">
-                            Simpan Perubahan
+                    <div class="flex flex-col gap-3">
+                        <div class="flex gap-3">
+                            <button type="button" onclick="closeDiscountModal()" 
+                                class="flex-1 px-4 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition-all">Batal</button>
+                            <button type="submit" 
+                                class="flex-[2] px-4 py-3 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i> Simpan
+                            </button>
+                        </div>
+                        
+                        <button type="button" onclick="deleteDiscount()" id="btnDeleteDiscount"
+                            class="w-full px-4 py-3 bg-rose-50 text-rose-600 border border-rose-100 rounded-xl font-bold hover:bg-rose-600 hover:text-white transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i> Hapus Semua Diskon
                         </button>
                     </div>
                 </form>
@@ -211,10 +216,25 @@
             document.getElementById('modal_user_name').innerText = name;
             document.getElementById('modal_discount_input').value = currentDiscount;
             document.getElementById('discountModal').classList.remove('hidden');
+
+            // Logika sembunyi/tampilkan tombol hapus
+            const btnDelete = document.getElementById('btnDeleteDiscount');
+            if(parseFloat(currentDiscount) <= 0) {
+                btnDelete.classList.add('hidden');
+            } else {
+                btnDelete.classList.remove('hidden');
+            }
         }
 
         function closeDiscountModal() {
             document.getElementById('discountModal').classList.add('hidden');
+        }
+
+        function deleteDiscount() {
+            if(confirm('Hapus semua diskon untuk member ini?')) {
+                document.getElementById('modal_discount_input').value = 0;
+                document.getElementById('discountForm').submit();
+            }
         }
 
         window.onclick = function(event) {
